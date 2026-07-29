@@ -5,7 +5,6 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +45,7 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public Collection<Item> search(String text) {
-        String normalizedText = text.toLowerCase(Locale.ROOT);
+        String normalizedText = text.toLowerCase();
         return items.values().stream()
                 .filter(item -> Boolean.TRUE.equals(item.getAvailable()))
                 .filter(item -> containsText(item.getName(), normalizedText)
@@ -55,6 +54,6 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     private boolean containsText(String value, String text) {
-        return value != null && value.toLowerCase(Locale.ROOT).contains(text);
+        return value != null && value.toLowerCase().contains(text);
     }
 }
