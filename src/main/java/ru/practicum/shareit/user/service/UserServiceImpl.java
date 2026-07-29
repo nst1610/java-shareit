@@ -21,8 +21,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         validateEmail(userDto.getEmail(), null);
-        User user = userStorage.create(userMapper.toItem(userDto));
-        return userMapper.toItemDto(user);
+        User user = userStorage.create(userMapper.toUser(userDto));
+        return userMapper.toUserDto(user);
     }
 
     @Override
@@ -35,17 +35,17 @@ public class UserServiceImpl implements UserService {
             validateEmail(userDto.getEmail(), userId);
             user.setEmail(userDto.getEmail());
         }
-        return userMapper.toItemDto(userStorage.update(user));
+        return userMapper.toUserDto(userStorage.update(user));
     }
 
     @Override
     public UserDto getById(Long userId) {
-        return userMapper.toItemDto(getUserOrThrow(userId));
+        return userMapper.toUserDto(getUserOrThrow(userId));
     }
 
     @Override
     public Collection<UserDto> getAll() {
-        return userStorage.getAll().stream().map(userMapper::toItemDto).collect(Collectors.toList());
+        return userStorage.getAll().stream().map(userMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
