@@ -32,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Long ownerId, Long itemId, ItemDto itemDto) {
         getUserOrThrow(ownerId);
-        Item item= getItemOrThrow(itemId);
+        Item item = getItemOrThrow(itemId);
         if (!item.getOwner().getId().equals(ownerId)) {
             throw new ForbiddenOperationException("Only the owner can edit the item");
         }
