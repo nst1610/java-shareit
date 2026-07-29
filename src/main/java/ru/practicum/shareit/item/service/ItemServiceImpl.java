@@ -45,6 +45,9 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
+        if (itemDto.getRequest() != null) {
+            item.setRequest(itemDto.getRequest());
+        }
         return itemMapper.toItemDto(itemStorage.update(item));
     }
 
