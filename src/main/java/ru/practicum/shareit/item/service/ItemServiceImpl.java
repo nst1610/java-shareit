@@ -37,9 +37,11 @@ public class ItemServiceImpl implements ItemService {
             throw new ForbiddenOperationException("Only the owner can edit the item");
         }
         if (itemDto.getName() != null) {
+            validateTextField(itemDto.getName(), "name");
             item.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
+            validateTextField(itemDto.getDescription(), "description");
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
@@ -85,5 +87,11 @@ public class ItemServiceImpl implements ItemService {
     private Item getItemOrThrow(Long itemId) {
         return itemStorage.findById(itemId)
             .orElseThrow(() -> new NotFoundException("Item not found: " + itemId));
+    }
+
+    private void validateTextField(String value, String fieldName) {
+        if (value.isBlank()) {
+            throw new IllegalArgumentException("Item " + fieldName + " must not be blank");
+        }
     }
 }

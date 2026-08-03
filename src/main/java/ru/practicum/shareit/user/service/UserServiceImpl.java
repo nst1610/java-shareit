@@ -29,9 +29,11 @@ public class UserServiceImpl implements UserService {
     public UserDto update(Long userId, UserDto userDto) {
         User user = getUserOrThrow(userId);
         if (userDto.getName() != null) {
+            validateTextField(userDto.getName(), "name");
             user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
+            validateTextField(userDto.getEmail(), "email");
             validateEmail(userDto.getEmail(), userId);
             user.setEmail(userDto.getEmail());
         }
@@ -50,6 +52,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long userId) {
+        getUserOrThrow(userId);
         userStorage.delete(userId);
     }
 
@@ -64,5 +67,11 @@ public class UserServiceImpl implements UserService {
     private User getUserOrThrow(Long userId) {
         return userStorage.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+    }
+
+    private void validateTextField(String value, String fieldName) {
+        if (value.isBlank()) {
+            throw new IllegalArgumentException("User " + fieldName + " must not be blank");
+        }
     }
 }

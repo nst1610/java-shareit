@@ -24,9 +24,6 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public Item update(Item item) {
         Long itemId = item.getId();
-        if (!items.containsKey(itemId)) {
-            throw new ru.practicum.shareit.exception.NotFoundException("Item with id=" + itemId + " was not found");
-        }
         items.put(itemId, item);
         return item;
     }
