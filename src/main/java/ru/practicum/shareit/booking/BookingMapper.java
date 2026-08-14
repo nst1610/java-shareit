@@ -4,11 +4,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.user.UserMapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ItemMapper.class, UserMapper.class})
 public interface BookingMapper {
-    @Mapping(target = "itemId", source = "item.id")
-    @Mapping(target = "bookerId", source = "booker.id")
+    @Mapping(target = "booker", source = "booker")
     BookingDto toDto(Booking booking);
 
     @Mapping(target = "id", ignore = true)

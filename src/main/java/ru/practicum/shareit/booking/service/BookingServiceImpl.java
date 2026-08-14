@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.exception.ForbiddenOperationException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
@@ -48,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto approve(Long ownerId, Long bookingId, boolean approved) {
         Booking booking = getBookingOrThrow(bookingId);
         if (!booking.getItem().getOwner().getId().equals(ownerId)) {
-            throw new ConflictException("Only item owner can approve booking");
+            throw new ForbiddenOperationException("Only item owner can approve booking");
         }
         if (booking.getStatus() != BookingStatus.WAITING) {
             throw new ConflictException("Booking status has already been updated");
@@ -118,7 +119,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Booking end must be after booking start");
         }
         if (!item.getAvailable()) {
-            throw new ConflictException("Item is not available for booking");
+            throw new BadRequestException("Item is not available for booking");
         }
         if (item.getOwner().getId().equals(userId)) {
             throw new ConflictException("Owner cannot book own item");
