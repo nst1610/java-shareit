@@ -18,7 +18,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -85,14 +84,20 @@ public class ItemServiceImpl implements ItemService {
         if (items.isEmpty()) {
             return List.of();
         }
+        List<Long> itemIds = items.stream().map(Item::getId).toList();
         Map<Long, List<Comment>> commentsByItemId = commentRepository
-                .findAllByItemIdInOrderByCreatedAsc(items.stream().map(Item::getId).toList())
+                .findAllByItemIdInOrderByCreatedAsc(itemIds)
                 .stream()
                 .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
+        Map<Long, List<Booking>> bookingsByItemId = bookingRepository
+                .findAllByItemIdInAndStatusOrderByStartAsc(itemIds, BookingStatus.APPROVED)
+                .stream()
+                .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
         return items.stream()
                 .map(item -> toItemDetailsDto(
                     item, ownerId,
-                    commentsByItemId.getOrDefault(item.getId(), Collections.emptyList())
+                    commentsByItemId.getOrDefault(item.getId(), Collections.emptyList()),
+                    bookingsByItemId.getOrDefault(item.getId(), Collections.emptyList())
                 ))
                 .toList();
     }
@@ -143,30 +148,19 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private ItemRequest toItemRequest(Long requestId) {
-        if (requestId == null) {
-            return null;
-        }
-        return ItemRequest.builder().id(requestId).build();
-    }
-
     private ItemDetailsDto toItemDetailsDto(Item item, Long userId) {
         List<Comment> comments = commentRepository.findAllByItemIdOrderByCreatedAsc(item.getId());
-        return toItemDetailsDto(item, userId, comments);
+        List<Booking> bookings = bookingRepository.findAllByItemIdOrderByStartDesc(item.getId());
+        return toItemDetailsDto(item, userId, comments, bookings);
     }
 
-    private ItemDetailsDto toItemDetailsDto(Item item, Long userId, List<Comment> comments) {
+    private ItemDetailsDto toItemDetailsDto(Item item, Long userId, List<Comment> comments, List<Booking> bookings) {
         ItemDetailsDto itemDto = itemMapper.toItemDetailsDto(item);
         itemDto.setComments(comments.stream().map(commentMapper::toDto).toList());
         if (item.getOwner().getId().equals(userId)) {
-            enrichBookings(itemDto, item);
+            fillBookingDates(itemDto, bookings);
         }
         return itemDto;
-    }
-
-    private void enrichBookings(ItemDetailsDto itemDto, Item item) {
-        List<Booking> bookings = bookingRepository.findAllByItemIdOrderByStartDesc(item.getId());
-        fillBookingDates(itemDto, bookings);
     }
 
     private void fillBookingDates(ItemDetailsDto itemDto, List<Booking> bookings) {
@@ -174,13 +168,13 @@ public class ItemServiceImpl implements ItemService {
         bookings.stream()
                 .filter(booking -> booking.getStatus() == BookingStatus.APPROVED)
                 .filter(booking -> booking.getStart().isBefore(now))
-                .findFirst()
+                .reduce((first, second) -> second)
                 .map(Booking::getStart)
                 .ifPresent(itemDto::setLastBooking);
         bookings.stream()
                 .filter(booking -> booking.getStatus() == BookingStatus.APPROVED)
                 .filter(booking -> booking.getStart().isAfter(now))
-                .reduce((first, second) -> second)
+                .findFirst()
                 .map(Booking::getStart)
                 .ifPresent(itemDto::setNextBooking);
     }
