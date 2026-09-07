@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.User;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -24,4 +25,7 @@ public class ItemRequest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requestor_id", nullable = false)
     private User requestor;
+
+    @Column(name = "created", nullable = false)
+    private LocalDateTime created;
 }
