@@ -1,19 +1,22 @@
 package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemUpdateDto {
-    @Pattern(regexp = ".*\\S.*", message = "Item name must not be blank")
+public class ItemDto {
+    private Long id;
+
     private String name;
 
-    @Pattern(regexp = ".*\\S.*", message = "Item description must not be blank")
     private String description;
 
     private Boolean available;
+
+    private Long requestId;
 }
