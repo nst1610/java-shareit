@@ -33,7 +33,7 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getById(Long userId) {
-        return get("/", userId);
+        return get("/" + userId);
     }
 
     public ResponseEntity<Object> getAll() {
