@@ -13,7 +13,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.storage.UserRepository;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,11 +32,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestDto create(Long userId, ItemRequestCreateDto requestDto) {
         User requestor = getUserOrThrow(userId);
-        ItemRequest request = ItemRequest.builder()
-                .description(requestDto.getDescription())
-                .requestor(requestor)
-                .created(LocalDateTime.now())
-                .build();
+        ItemRequest request = requestMapper.toEntity(requestDto, requestor);
         return requestMapper.toDto(requestRepository.save(request), List.of());
     }
 

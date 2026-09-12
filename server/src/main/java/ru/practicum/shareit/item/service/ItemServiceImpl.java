@@ -108,9 +108,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Collection<ItemDto> search(Long userId, String text) {
         getUserOrThrow(userId);
-        if (text == null || text.isBlank()) {
-            return java.util.List.of();
-        }
         return itemRepository.searchAvailable(text).stream()
                 .map(itemMapper::toItemDto)
                 .toList();

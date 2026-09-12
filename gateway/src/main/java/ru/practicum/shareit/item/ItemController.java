@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import java.util.List;
 
 @RestController
 @RequestMapping("/items")
@@ -50,7 +51,10 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestHeader(USER_ID_HEADER) Long userId,
-                                         @RequestParam String text) {
+                                         @RequestParam(required = false) String text) {
+        if (text == null || text.isBlank()) {
+            return ResponseEntity.ok(List.of());
+        }
         return itemClient.search(userId, text);
     }
 
